@@ -28,14 +28,14 @@ public class FileClientService {
         byte[] fileBytes = new byte[(int)new File(src).length()];
 
         try {
-            SecretKey secretKey = ByteArrayEncryption.generateSecretKey();
+            //SecretKey secretKey = ByteArrayEncryption.generateSecretKey();
             fileInputStream = new FileInputStream(src);
             fileInputStream.read(fileBytes);//将src文件读入到程序的字节数组
-            System.out.println(fileBytes);
-            fileBytes = ByteArrayEncryption.encryptData(fileBytes, secretKey);
+            //System.out.println(fileBytes);
+            //fileBytes = ByteArrayEncryption.encryptData(fileBytes, secretKey);
             //将文件对应的字节数组设置message
             message.setFileBytes(fileBytes);
-            message.setSecretKey(secretKey);
+            //message.setSecretKey(secretKey);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

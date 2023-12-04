@@ -3,6 +3,7 @@ package com.chj.code.view;
 import com.chj.code.service.FileClientService;
 import com.chj.code.service.MessageClientService;
 import com.chj.code.service.UserClientService;
+import com.chj.code.utils.MessageAppenderFrame;
 import com.chj.code.utils.Utility;
 import com.chj.code.utils.HuffmanNode;
 import com.chj.common.CustomDialogExample;
@@ -22,10 +23,36 @@ public class View extends JFrame {
     public static void main(String[] args) {
         HuffmanNode huffmanNode = new HuffmanNode();
         SwingUtilities.invokeLater(() -> {
+            new MessageAppenderFrame().setVisible(true);
             new View().createAndShowGUI();
         });
 
     }
+
+    public static void showonlist(String[] onlineList){
+        JDialog dialog = new JDialog();
+        dialog.setTitle("OnlineUsers");
+        dialog.setModal(true); // 设置为模态对话框，阻塞用户与其他窗口的交互
+
+        // 创建文本区域
+        JTextArea textArea = new JTextArea();
+        JScrollPane scrollPane = new JScrollPane(textArea);
+
+        // 将文本区域添加到对话框
+        dialog.getContentPane().add(scrollPane, BorderLayout.CENTER);
+
+        // 模拟一些动态追加的文本
+
+        for(int i = 0; i < onlineList.length; i ++){
+            textArea.append("                           User: " + onlineList[i] + "\n");
+        }
+
+        // 设置对话框大小
+        dialog.setSize(300, 250);
+        // 设置对话框可见性
+        dialog.setVisible(true);
+    }
+
 
     public void createAndShowGUI() {
         setTitle("Network Communication System");
@@ -97,9 +124,11 @@ public class View extends JFrame {
             switch (choice) {
                 case 0:
                     userClientService.onlineFriendList();
+
                     break;
                 case 1:
                     String groupMessage = JOptionPane.showInputDialog("Enter message to send to all users:");
+                    MessageAppenderFrame.appendMessage(userId + " to all:" + groupMessage + "\n");
                     groupMessage = HuffmanNode.EncodeTxT(groupMessage);
                     messageClientService.sendMessageToAll(groupMessage, userId);
 
@@ -108,20 +137,7 @@ public class View extends JFrame {
                     String getterId = JOptionPane.showInputDialog("Enter the user ID to send a private message:");
                     String privateMessage = JOptionPane.showInputDialog("Enter the private message:");
 
-                    JFrame frame = new JFrame("Custom Dialog Example");
-                    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-                    // 创建按钮，点击按钮时弹出自定义对话框
-                    JButton button = new JButton("Show Custom Dialog");
-                    button.addActionListener(e -> CustomDialogExample.showCustomDialog(getterId, privateMessage));
-
-                    // 将按钮添加到主窗口
-                    frame.getContentPane().add(button, BorderLayout.CENTER);
-
-                    // 设置窗口大小和可见性
-                    frame.setSize(300, 200);
-                    frame.setVisible(true);
-
+                    MessageAppenderFrame.appendMessage(userId + " to " + getterId + ":" + privateMessage);
 
                     String newmessage = HuffmanNode.EncodeTxT(privateMessage);
                     messageClientService.sendMessageToOne(newmessage, userId, getterId);

@@ -2,9 +2,13 @@ package com.chj.code.service;
 
 import com.chj.code.utils.ByteArrayEncryption;
 import com.chj.code.utils.HuffmanNode;
+import com.chj.code.utils.MessageAppenderFrame;
 import com.chj.common.Message;
 import com.chj.common.MessageType;
+import com.chj.code.view.View;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.net.Socket;
@@ -41,36 +45,33 @@ public class ClientConnectServerThread extends Thread {
                     //取出在线列表信息，并显示
                     //规定
                     String[] onlineUsers = message.getContent().split(" ");
-                    System.out.println("\n=======当前在线用户列表========");
-                    for (int i = 0; i < onlineUsers.length; i++) {
-                        System.out.println("用户: " + onlineUsers[i]);
-                    }
+
+                    View.showonlist(onlineUsers);
 
                 } else if (message.getMesType().equals(MessageType.MESSAGE_COMM_MES)) {//普通的聊天消息
                     //把从服务器转发的消息，显示到控制台即可
-                    //message.setContent(huffmanNode.DecodeTxT(message.getContent()));
                     message.setContent(HuffmanNode.DecodeTxT(message.getContent()));
-                    System.out.println("\n" + message.getSender()
-                            + " 对 " + message.getGetter() + " 说: " + message.getContent());
+                    MessageAppenderFrame.appendMessage(message.getSender()
+                            + " to " + message.getGetter() + ":" + message.getContent() + "\n");
                 } else if (message.getMesType().equals(MessageType.MESSAGE_TO_ALL_MES)) {
                     //显示在客户端的控制台
                     message.setContent(HuffmanNode.DecodeTxT(message.getContent()));
-                    System.out.println("\n" + message.getSender() + " 对大家说: " + message.getContent());
+                    MessageAppenderFrame.appendMessage(message.getSender() + " to all:" + message.getContent() + "\n");
                 } else if (message.getMesType().equals(MessageType.MESSAGE_FILE_MES)) {//如果是文件消息
                     //让用户指定保存路径。。。
-                    System.out.println("\n" + message.getSender() + " 给 " + message.getGetter()
-                            + " 发文件: " + message.getSrc() + " 到我的电脑的目录 " + message.getDest());
+                    System.out.println(message.getSender() + " 给 " + message.getGetter()
+                            + " 发文件: " + message.getSrc() + " 到我的电脑的目录 " + message.getDest() + "\n");
 
                     //取出message的文件字节数组，通过文件输出流写出到磁盘
                     System.out.println(message.getFileBytes().length);
-                    message.setFileBytes(ByteArrayEncryption.decryptData(message.getFileBytes(), message.getSecretKey()));
+                    //message.setFileBytes(ByteArrayEncryption.decryptData(message.getFileBytes(), message.getSecretKey()));
                     FileOutputStream fileOutputStream = new FileOutputStream(message.getDest(), true);
                     fileOutputStream.write(message.getFileBytes());
                     fileOutputStream.close();
-                    System.out.println("\n 保存文件成功~");
+                    MessageAppenderFrame.appendMessage(" 保存文件成功~\n");
 
                 } else {
-                    System.out.println("是其他类型的message, 暂时不处理....");
+                    MessageAppenderFrame.appendMessage("是其他类型的message, 暂时不处理....");
                 }
 
             } catch (Exception e) {
