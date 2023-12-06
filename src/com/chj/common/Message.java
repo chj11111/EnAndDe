@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.PublicKey;
 import java.util.Base64;
 
 
@@ -16,6 +17,7 @@ public class Message implements Serializable {
     private String content;//消息内容
     private String sendTime;//发送时间
     private String mesType;//消息类型[可以在接口定义消息类型]
+    private PublicKey pk; //公钥
 
     //进行扩展 和文件相关的成员
     private byte[] fileBytes;
@@ -103,5 +105,13 @@ public class Message implements Serializable {
 
     public void setSendTime(String sendTime) {
         this.sendTime = sendTime;
+    }
+
+    public PublicKey getPk() {
+        return pk;
+    }
+
+    public void setPk(PublicKey pk) {
+        this.pk = pk;
     }
 }

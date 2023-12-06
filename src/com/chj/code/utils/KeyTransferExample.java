@@ -26,13 +26,13 @@ public class KeyTransferExample {
         // 在实际应用中，你需要将加密后的密钥发送给另一方，并确保安全传输。
     }
 
-    private static KeyPair generateKeyPair() throws Exception {
+    public static KeyPair generateKeyPair() throws Exception {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(2048);
         return keyPairGenerator.generateKeyPair();
     }
 
-    private static byte[] encryptKey(SecretKey secretKey, PublicKey publicKey) throws Exception {
+    public static byte[] encryptKey(SecretKey secretKey, PublicKey publicKey) throws Exception {
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
         return cipher.doFinal(secretKey.getEncoded());
