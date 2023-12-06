@@ -7,13 +7,20 @@ import com.chj.common.Message;
 import com.chj.common.MessageType;
 import com.chj.code.view.View;
 
+import javax.crypto.SecretKey;
 import javax.swing.*;
 import java.awt.*;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.net.Socket;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.HashMap;
+import com.chj.code.utils.KeyTransferExample;
 
 public class ClientConnectServerThread extends Thread {
+
+    public static HashMap<String, PublicKey> UserPK = new HashMap<>();
     //该线程需要持有Socket
     private Socket socket;
 
@@ -57,14 +64,24 @@ public class ClientConnectServerThread extends Thread {
                     //显示在客户端的控制台
                     message.setContent(HuffmanNode.DecodeTxT(message.getContent()));
                     MessageAppenderFrame.appendMessage(message.getSender() + " to all:" + message.getContent() + "\n");
-                } else if (message.getMesType().equals(MessageType.MESSAGE_FILE_MES)) {//如果是文件消息
+                }
+
+                else if(message.getMesType().equals(MessageType.MESSAGE_GET_PK)){
+                    UserPK.put(message.getGetter(), message.getPk());
+                }else if (message.getMesType().equals(MessageType.MESSAGE_FILE_MES)) {//如果是文件消息
                     //让用户指定保存路径。。。
-                    System.out.println(message.getSender() + " 给 " + message.getGetter()
-                            + " 发文件: " + message.getSrc() + " 到我的电脑的目录 " + message.getDest() + "\n");
+                    //System.out.println(message.getSender() + " 给 " + message.getGetter()
+                    //      + " 发文件: " + message.getSrc() + " 到我的电脑的目录 " + message.getDest() + "\n");
 
                     //取出message的文件字节数组，通过文件输出流写出到磁盘
-                    System.out.println(message.getFileBytes().length);
-                    //message.setFileBytes(ByteArrayEncryption.decryptData(message.getFileBytes(), message.getSecretKey()));
+                    //System.out.println(message.getFileBytes().length);
+
+                    PrivateKey privateKey = UserClientService.privateKey;
+
+                    SecretKey secretKey = KeyTransferExample.decryptKey(message.getSecretKey(), privateKey);
+
+                    message.setFileBytes(ByteArrayEncryption.decryptData(message.getFileBytes(), secretKey));
+
                     FileOutputStream fileOutputStream = new FileOutputStream(message.getDest(), true);
                     fileOutputStream.write(message.getFileBytes());
                     fileOutputStream.close();
@@ -86,4 +103,5 @@ public class ClientConnectServerThread extends Thread {
     public Socket getSocket() {
         return socket;
     }
+
 }

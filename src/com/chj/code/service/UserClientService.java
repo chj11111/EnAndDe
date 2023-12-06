@@ -10,15 +10,24 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 public class UserClientService {
 
     //因为我们可能在其他地方用使用user信息, 因此作出成员属性
     private User u = new User();
+
+    public static PrivateKey privateKey;
     //因为Socket在其它地方也可能使用，因此作出属性
     private Socket socket;
 
     //根据userId 和 pwd 到服务器验证该用户是否合法
+
+    public static void setPrivateKey(KeyPair keyPair){
+        privateKey = keyPair.getPrivate();
+    }
     public boolean checkUser(String userId, String pwd) {
         boolean b = false;
         //创建User对象
@@ -72,6 +81,27 @@ public class UserClientService {
     }
 
     //向服务器端请求在线用户列表
+
+
+    public void SendPK(KeyPair keyPair){
+        Message message = new Message();
+        message.setSender(u.getUserId());
+        message.setMesType(MessageType.MESSAGE_SEND_PK);
+        message.setPk(keyPair.getPublic());
+
+        try {
+            //从管理线程的集合中，通过userId, 得到这个线程对象
+            ClientConnectServerThread clientConnectServerThread =
+                    ManageClientConnectServerThread.getClientConnectServerThread(u.getUserId());
+            //通过这个线程得到关联的socket
+            Socket socket = clientConnectServerThread.getSocket();
+            //得到当前线程的Socket 对应的 ObjectOutputStream对象
+            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.writeObject(message); //发送一个Message对象，向服务端发送自身的公钥
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public void onlineFriendList() {
 
         //发送一个Message , 类型MESSAGE_GET_ONLINE_FRIEND

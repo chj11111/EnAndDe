@@ -3,15 +3,19 @@ package com.chj.code.view;
 import com.chj.code.service.FileClientService;
 import com.chj.code.service.MessageClientService;
 import com.chj.code.service.UserClientService;
+import com.chj.code.utils.KeyTransferExample;
 import com.chj.code.utils.MessageAppenderFrame;
 import com.chj.code.utils.Utility;
 import com.chj.code.utils.HuffmanNode;
 import com.chj.common.CustomDialogExample;
+import com.chj.code.service.ClientConnectServerThread;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.security.KeyPair;
+import java.security.PublicKey;
 
 public class View extends JFrame {
     private boolean loop = true; //控制是否显示菜单
@@ -86,7 +90,11 @@ public class View extends JFrame {
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                handleLogin();
+                try {
+                    handleLogin();
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
 
@@ -98,7 +106,7 @@ public class View extends JFrame {
         });
     }
 
-    private void handleLogin() {
+    private void handleLogin() throws Exception {
         String userId = JOptionPane.showInputDialog("Enter user ID:");
         String password = JOptionPane.showInputDialog("Enter password:");
 
@@ -115,25 +123,31 @@ public class View extends JFrame {
     }
 
     //显示主菜单
-    private void showSecondMenu(String userId) {
+    private void showSecondMenu(String userId) throws Exception {
         while (loop) {
-            String[] options = {"Display Online Users", "Send Group Message", "Send Private Message", "Send File", "Exit"};
+            String[] options = {"Send Public to Server","Display Online Users", "Send Group Message", "Send Private Message", "Send File", "Exit"};
             int choice = JOptionPane.showOptionDialog(this, "Network Communication System - User " + userId, "Menu",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 
             switch (choice) {
                 case 0:
+                    KeyPair keyPair = KeyTransferExample.generateKeyPair();
+                    userClientService.SendPK(keyPair);
+                    UserClientService.setPrivateKey(keyPair);
+                    break;
+
+                case 1:
                     userClientService.onlineFriendList();
 
                     break;
-                case 1:
+                case 2:
                     String groupMessage = JOptionPane.showInputDialog("Enter message to send to all users:");
                     MessageAppenderFrame.appendMessage(userId + " to all:" + groupMessage + "\n");
                     groupMessage = HuffmanNode.EncodeTxT(groupMessage);
                     messageClientService.sendMessageToAll(groupMessage, userId);
 
                     break;
-                case 2:
+                case 3:
                     String getterId = JOptionPane.showInputDialog("Enter the user ID to send a private message:");
                     String privateMessage = JOptionPane.showInputDialog("Enter the private message:");
 
@@ -142,13 +156,17 @@ public class View extends JFrame {
                     String newmessage = HuffmanNode.EncodeTxT(privateMessage);
                     messageClientService.sendMessageToOne(newmessage, userId, getterId);
                     break;
-                case 3:
+                case 4:
                     String fileGetterId = JOptionPane.showInputDialog("Enter the user ID to send a file:");
                     String fileSrc = JOptionPane.showInputDialog("Enter the file source path:");
                     String fileDest = JOptionPane.showInputDialog("Enter the file destination path:");
-                    fileClientService.sendFileToOne(fileSrc, fileDest, userId, fileGetterId);
+                    fileClientService.SendPkRequest(userId, fileGetterId);
+                    ////在这里阻塞一会线程
+                    PublicKey Pk = ClientConnectServerThread.UserPK.get(fileGetterId);
+                    System.out.println(userId + ClientConnectServerThread.UserPK.get(fileGetterId));
+                    fileClientService.sendFileToOne(fileSrc, fileDest, userId, fileGetterId, Pk);
                     break;
-                case 4:
+                case 5:
                     userClientService.logout();
                     loop = false;
                     break;

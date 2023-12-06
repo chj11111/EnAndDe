@@ -9,10 +9,28 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-
+import java.security.PublicKey;
+import com.chj.code.utils.KeyTransferExample;
 public class FileClientService {
 
-    public void sendFileToOne(String src, String dest, String senderId, String getterId) {
+
+    public void SendPkRequest(String senderId, String getterId){
+        Message message = new Message();
+        message.setSender(senderId);
+        message.setGetter(getterId);
+        message.setMesType(MessageType.MESSAGE_GET_PK);
+
+        try {
+            ObjectOutputStream oos =
+                    new ObjectOutputStream(ManageClientConnectServerThread.getClientConnectServerThread(senderId).getSocket().getOutputStream());
+
+            oos.writeObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendFileToOne(String src, String dest, String senderId, String getterId, PublicKey Pk) {
 
         //读取src文件  -->  message
         Message message = new Message();
@@ -28,14 +46,22 @@ public class FileClientService {
         byte[] fileBytes = new byte[(int)new File(src).length()];
 
         try {
-            //SecretKey secretKey = ByteArrayEncryption.generateSecretKey();
+            SecretKey secretKey = ByteArrayEncryption.generateSecretKey();
+
             fileInputStream = new FileInputStream(src);
             fileInputStream.read(fileBytes);//将src文件读入到程序的字节数组
             //System.out.println(fileBytes);
-            //fileBytes = ByteArrayEncryption.encryptData(fileBytes, secretKey);
+            fileBytes = ByteArrayEncryption.encryptData(fileBytes, secretKey);
+
             //将文件对应的字节数组设置message
             message.setFileBytes(fileBytes);
             //message.setSecretKey(secretKey);
+
+            byte[] encryptedKey = KeyTransferExample.encryptKey(secretKey, Pk);
+
+            message.setSecretKey(encryptedKey);
+
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
