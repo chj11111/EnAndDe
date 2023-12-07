@@ -1,6 +1,6 @@
 package com.chj.common;
 import javax.swing.*;
-import java.awt.BorderLayout;
+import java.awt.*;
 
 public class CustomDialogExample {
 
@@ -17,15 +17,13 @@ public class CustomDialogExample {
         // 将文本区域添加到对话框
         dialog.getContentPane().add(scrollPane, BorderLayout.CENTER);
 
-        // 模拟一些动态追加的文本
+        // 动态追加的文本
         textArea.append(message);
-//            try {
-//                // 暂停一段时间，模拟实际应用中不断追加文本的情况
-//                Thread.sleep(1000);
-//            } catch (InterruptedException ex) {
-//                ex.printStackTrace();
-//            }
 
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int x = 0; // 左上角 x 坐标
+        int y = 0; // 左上角 y 坐标
+        dialog.setLocation(x, y);
         // 设置对话框大小
         dialog.setSize(300, 200);
         // 设置对话框可见性

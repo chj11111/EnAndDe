@@ -44,6 +44,7 @@ public class View extends JFrame {
 
         // 将文本区域添加到对话框
         dialog.getContentPane().add(scrollPane, BorderLayout.CENTER);
+        dialog.setLocationRelativeTo(null);
 
         // 模拟一些动态追加的文本
 
@@ -55,6 +56,8 @@ public class View extends JFrame {
         dialog.setSize(300, 250);
         // 设置对话框可见性
         dialog.setVisible(true);
+
+
     }
 
 
@@ -162,7 +165,9 @@ public class View extends JFrame {
                     String fileDest = JOptionPane.showInputDialog("Enter the file destination path:");
                     fileClientService.SendPkRequest(userId, fileGetterId);
                     ////在这里阻塞一会线程
+                    Thread.sleep(1000);
                     PublicKey Pk = ClientConnectServerThread.UserPK.get(fileGetterId);
+                    System.out.println(userId + ClientConnectServerThread.UserPK.get(fileGetterId));
                     System.out.println(userId + ClientConnectServerThread.UserPK.get(fileGetterId));
                     fileClientService.sendFileToOne(fileSrc, fileDest, userId, fileGetterId, Pk);
                     break;

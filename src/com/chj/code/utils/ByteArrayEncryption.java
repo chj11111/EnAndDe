@@ -13,55 +13,6 @@ import java.util.Base64;
 
 
 public class ByteArrayEncryption {
-    public static void main(String[] args) throws Exception {
-        // 生成对称密钥
-        SecretKey secretKey = generateSecretKey();
-
-        KeyPair keyPair = KeyTransferExample.generateKeyPair();
-
-        // 待加密的字节数组
-
-        String src = "C:\\Users\\lx\\Desktop\\作业\\数据库08.pdf";
-
-        String dst = "C:\\Users\\lx\\Desktop\\作业\\4.pdf";
-        FileInputStream fileInputStream = null;
-
-        byte[] fileBytes = new byte[(int)new File(src).length()];
-
-        try {
-            fileInputStream = new FileInputStream(src);
-            fileInputStream.read(fileBytes);//将src文件读入到程序的字节数组
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            //关闭
-            if(fileInputStream != null) {
-                try {
-                    fileInputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        // 加密
-        byte[] encryptedData = encryptData(fileBytes, secretKey);
-
-        byte[] encry = KeyTransferExample.encryptKey(secretKey, keyPair.getPublic());
-
-        SecretKey decry = KeyTransferExample.decryptKey(encry, keyPair.getPrivate());
-        //System.out.println("Encrypted Data: " + new String(encryptedData));
-
-        // 解密
-        byte[] decryptedData = decryptData(encryptedData, decry);
-        //System.out.println("Decrypted Data: " + new String(decryptedData));
-
-
-        FileOutputStream fileOutputStream = new FileOutputStream(dst, true);
-        fileOutputStream.write(decryptedData);
-        fileOutputStream.close();
-    }
 
     public static SecretKey generateSecretKey() throws Exception {
         KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");

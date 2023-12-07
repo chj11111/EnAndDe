@@ -14,20 +14,6 @@ import static com.chj.code.utils.ByteArrayEncryption.generateSecretKey;
 
 public class KeyTransferExample {
 
-    public static void main(String[] args) throws Exception {
-        // 生成对称密钥
-        SecretKey secretKey = generateSecretKey();
-
-        // 生成非对称密钥对（公钥和私钥）
-        KeyPair keyPair = generateKeyPair();
-
-        // 使用公钥加密对称密钥
-        byte[] encryptedKey = encryptKey(secretKey, keyPair.getPublic());
-        System.out.println("Encrypted Key: " + Base64.getEncoder().encodeToString(encryptedKey));
-
-        // 在实际应用中，你需要将加密后的密钥发送给另一方，并确保安全传输。
-    }
-
     public static KeyPair generateKeyPair() throws Exception {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(2048);
