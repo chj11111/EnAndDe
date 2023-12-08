@@ -16,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.security.KeyPair;
 import java.security.PublicKey;
+import java.util.Date;
 
 public class View extends JFrame {
     private boolean loop = true; //控制是否显示菜单
@@ -145,8 +146,8 @@ public class View extends JFrame {
                     break;
                 case 2:
                     String groupMessage = JOptionPane.showInputDialog("Enter message to send to all users:");
-                    MessageAppenderFrame.appendMessage(userId + " to all:" + groupMessage + "\n");
-                    groupMessage = HuffmanNode.EncodeTxT(groupMessage);
+                    MessageAppenderFrame.appendMessage(userId + " to all(" + new Date().toString() + "):" + groupMessage + "\n");
+                    //groupMessage = HuffmanNode.EncodeTxT(groupMessage);
                     messageClientService.sendMessageToAll(groupMessage, userId);
 
                     break;
@@ -154,10 +155,16 @@ public class View extends JFrame {
                     String getterId = JOptionPane.showInputDialog("Enter the user ID to send a private message:");
                     String privateMessage = JOptionPane.showInputDialog("Enter the private message:");
 
-                    MessageAppenderFrame.appendMessage(userId + " to " + getterId + ":" + privateMessage);
+                    fileClientService.SendPkRequest(userId, getterId);
+                    ////在这里阻塞一会线程
+                    Thread.sleep(1000);
+                    PublicKey Pk1 = ClientConnectServerThread.UserPK.get(getterId);
 
-                    String newmessage = HuffmanNode.EncodeTxT(privateMessage);
-                    messageClientService.sendMessageToOne(newmessage, userId, getterId);
+                    MessageAppenderFrame.appendMessage(userId + " to " + getterId +"(" + new Date().toString() +  "):" + privateMessage);
+
+                    byte[] newmessage = privateMessage.getBytes();
+                    //String newmessage = HuffmanNode.EncodeTxT(privateMessage);
+                    messageClientService.sendMessageToOne(newmessage, userId, getterId, Pk1);
                     break;
                 case 4:
                     String fileGetterId = JOptionPane.showInputDialog("Enter the user ID to send a file:");
@@ -166,10 +173,9 @@ public class View extends JFrame {
                     fileClientService.SendPkRequest(userId, fileGetterId);
                     ////在这里阻塞一会线程
                     Thread.sleep(1000);
-                    PublicKey Pk = ClientConnectServerThread.UserPK.get(fileGetterId);
-                    System.out.println(userId + ClientConnectServerThread.UserPK.get(fileGetterId));
-                    System.out.println(userId + ClientConnectServerThread.UserPK.get(fileGetterId));
-                    fileClientService.sendFileToOne(fileSrc, fileDest, userId, fileGetterId, Pk);
+                    PublicKey Pk2 = ClientConnectServerThread.UserPK.get(fileGetterId);
+
+                    fileClientService.sendFileToOne(fileSrc, fileDest, userId, fileGetterId, Pk2);
                     break;
                 case 5:
                     userClientService.logout();

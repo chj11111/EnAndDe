@@ -19,6 +19,8 @@ public class Message implements Serializable {
     private String mesType;//消息类型[可以在接口定义消息类型]
     private PublicKey pk; //公钥
 
+    private SecretKey groupSecretkey;
+
     //进行扩展 和文件相关的成员
     private byte[] fileBytes;
     private int fileLen = 0;
@@ -83,14 +85,6 @@ public class Message implements Serializable {
         this.getter = getter;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     public String getSendTime() {
         return sendTime;
     }
@@ -113,5 +107,22 @@ public class Message implements Serializable {
 
     public void setSecretKey(byte[] secretKey) {
         this.secretKey = secretKey;
+    }
+
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public SecretKey getGroupSecretkey() {
+        return groupSecretkey;
+    }
+
+    public void setGroupSecretkey(SecretKey groupSecretkey) {
+        this.groupSecretkey = groupSecretkey;
     }
 }

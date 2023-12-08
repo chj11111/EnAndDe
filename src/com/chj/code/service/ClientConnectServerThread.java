@@ -57,13 +57,25 @@ public class ClientConnectServerThread extends Thread {
 
                 } else if (message.getMesType().equals(MessageType.MESSAGE_COMM_MES)) {//普通的聊天消息
                     //把从服务器转发的消息，显示到控制台即可
-                    message.setContent(HuffmanNode.DecodeTxT(message.getContent()));
+                    //message.setContent(HuffmanNode.DecodeTxT(message.getContent()));
+
+                    SecretKey secretKey = KeyTransferExample.decryptKey(message.getSecretKey(), UserClientService.privateKey);
+
+                    message.setFileBytes(ByteArrayEncryption.decryptData(message.getFileBytes(), secretKey));
+                    message.setContent(new String(message.getFileBytes()));
+                    System.out.println(message.getContent());
+
                     MessageAppenderFrame.appendMessage(message.getSender()
-                            + " to " + message.getGetter() + ":" + message.getContent() + "\n");
+                            + " to " + message.getGetter() + "(" + message.getSendTime() + "):" + message.getContent() + "\n");
                 } else if (message.getMesType().equals(MessageType.MESSAGE_TO_ALL_MES)) {
                     //显示在客户端的控制台
-                    message.setContent(HuffmanNode.DecodeTxT(message.getContent()));
-                    MessageAppenderFrame.appendMessage(message.getSender() + " to all:" + message.getContent() + "\n");
+                    //message.setContent(HuffmanNode.DecodeTxT(message.getContent()));
+
+                    message.setFileBytes(ByteArrayEncryption.decryptData(message.getFileBytes(), message.getGroupSecretkey()));
+
+                    message.setContent(new String(message.getFileBytes()));
+
+                    MessageAppenderFrame.appendMessage(message.getSender() + " to all(" + message.getSendTime() + "):" + message.getContent() + "\n");
                 }
 
                 else if(message.getMesType().equals(MessageType.MESSAGE_GET_PK)){
